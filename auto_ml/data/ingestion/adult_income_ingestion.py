@@ -139,6 +139,11 @@ class AdultIncomeDataIngestion(BaseDataIngestion):
         
         # Convert target column to binary (0/1)
         if self.target_column in df.columns:
+            # Handle both training and test data formats
+            # Training data: <=50K, >50K
+            # Test data: <=50K., >50K. (with periods)
+            df[self.target_column] = df[self.target_column].str.strip()
+            df[self.target_column] = df[self.target_column].str.replace('.', '')
             df[self.target_column] = (df[self.target_column] == '>50K').astype(int)
         
         # Convert numerical columns to appropriate types
