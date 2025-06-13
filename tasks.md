@@ -109,3 +109,6 @@ Enhance the ML framework with advanced capabilities including hyperparameter opt
 ## Task 3 Progress Log
 
 - **2024-06-14**: Task 3 created with focus on advanced ML capabilities and production readiness.
+- **2024-06-14**: Step 1 completed: Added hyperparameter optimization to model training (RandomizedSearchCV for all models, real metrics verified).
+- **2024-06-14**: Step 2 completed: Added model persistence module with versioned saving/loading and integrated it into the main pipeline.
+- **2024-06-14**: Step 3 completed: Created `inference.py` for batch and programmatic inference. Supports loading any saved model version, applies feature pipeline, outputs predictions (with probabilities), and supports CLI and DataFrame input.

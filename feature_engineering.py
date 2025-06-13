@@ -44,6 +44,8 @@ class FeatureEngineering:
         imputer_cat (SimpleImputer): Imputer for categorical features (mode strategy)
         imputer_num (SimpleImputer): Imputer for numerical features (median strategy)
         is_fitted (bool): Whether the transformers have been fitted
+        cat_cols (Optional[List[str]]): Stored categorical columns
+        num_cols (Optional[List[str]]): Stored numerical columns
     """
     
     def __init__(self) -> None:
@@ -53,6 +55,8 @@ class FeatureEngineering:
         self.imputer_cat = SimpleImputer(strategy='most_frequent')
         self.imputer_num = SimpleImputer(strategy='median')
         self.is_fitted = False
+        self.cat_cols: Optional[List[str]] = None
+        self.num_cols: Optional[List[str]] = None
     
     def fit_transform(self, data: pd.DataFrame, categorical_columns: List[str], 
                      numerical_columns: List[str]) -> pd.DataFrame:
@@ -72,6 +76,10 @@ class FeatureEngineering:
             Exception: If any transformation step fails
         """
         self._validate_input(data, categorical_columns, numerical_columns)
+        
+        # Store columns for later use (inference)
+        self.cat_cols = categorical_columns
+        self.num_cols = numerical_columns
         
         logger.info("Starting feature engineering...")
         try:
@@ -97,15 +105,15 @@ class FeatureEngineering:
             logger.error(f"Error in fit_transform: {e}\n{traceback.format_exc()}")
             raise
     
-    def transform(self, data: pd.DataFrame, categorical_columns: List[str], 
-                 numerical_columns: List[str]) -> pd.DataFrame:
+    def transform(self, data: pd.DataFrame, categorical_columns: List[str] = None, 
+                 numerical_columns: List[str] = None) -> pd.DataFrame:
         """
         Transform data using fitted transformers.
         
         Args:
             data (pd.DataFrame): Input data to transform
-            categorical_columns (List[str]): List of categorical column names
-            numerical_columns (List[str]): List of numerical column names
+            categorical_columns (List[str], optional): List of categorical column names
+            numerical_columns (List[str], optional): List of numerical column names
             
         Returns:
             pd.DataFrame: Transformed data with all features engineered
@@ -116,6 +124,16 @@ class FeatureEngineering:
         """
         if not self.is_fitted:
             raise ValueError("FeatureEngineering must be fitted before transform")
+        
+        # Use stored columns if not provided
+        if categorical_columns is None:
+            if self.cat_cols is None:
+                raise ValueError("Categorical columns must be provided or fitted before transform")
+            categorical_columns = self.cat_cols
+        if numerical_columns is None:
+            if self.num_cols is None:
+                raise ValueError("Numerical columns must be provided or fitted before transform")
+            numerical_columns = self.num_cols
         
         self._validate_input(data, categorical_columns, numerical_columns)
         

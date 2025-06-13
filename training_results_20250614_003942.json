@@ -1,0 +1,45 @@
+{
+  "logistic_regression": {
+    "accuracy": 0.8286346047540077,
+    "precision": 0.7181818181818181,
+    "recall": 0.45189807592303693,
+    "f1": 0.5547398659431855,
+    "auc": 0.855284787185617,
+    "log_loss": 0.37743324678746504
+  },
+  "random_forest": {
+    "accuracy": 0.8634604754007739,
+    "precision": 0.7686196623634558,
+    "recall": 0.6037441497659907,
+    "f1": 0.6762778505897772,
+    "auc": 0.9164111831863704,
+    "log_loss": 0.2985056625330579
+  },
+  "gradient_boosting": {
+    "accuracy": 0.8716295067870524,
+    "precision": 0.7657384987893463,
+    "recall": 0.6578263130525221,
+    "f1": 0.7076923076923077,
+    "auc": 0.9259060479025515,
+    "log_loss": 0.28037124820324566
+  },
+  "lightgbm": {
+    "accuracy": 0.8724894048277133,
+    "precision": 0.7763897564022486,
+    "recall": 0.6463858554342173,
+    "f1": 0.7054483541430193,
+    "auc": 0.9268974434087938,
+    "log_loss": 0.2770499850664183
+  },
+  "hyperparameter_optimization": {
+    "enabled": true,
+    "optimized_models": [
+      "logistic_regression",
+      "random_forest",
+      "gradient_boosting",
+      "lightgbm"
+    ]
+  },
+  "best_model": "lightgbm",
+  "timestamp": "2025-06-14T00:39:42.559787"
+}

@@ -285,7 +285,19 @@ class ModelPersistence:
         """Get the next version number for a model."""
         models = self.list_models()
         if model_name in models:
-            return max(int(v) for v in models[model_name].keys()) + 1
+            # Extract numeric part from version_id (e.g., 'v1_20250614_003024' -> 1)
+            def extract_version_num(version_id):
+                if version_id.startswith('v'):
+                    parts = version_id.split('_')
+                    try:
+                        return int(parts[0][1:])
+                    except Exception:
+                        return 0
+                try:
+                    return int(version_id)
+                except Exception:
+                    return 0
+            return max(extract_version_num(v) for v in models[model_name].keys()) + 1
         else:
             return 1
     
