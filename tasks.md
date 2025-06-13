@@ -112,3 +112,45 @@ Enhance the ML framework with advanced capabilities including hyperparameter opt
 - **2024-06-14**: Step 1 completed: Added hyperparameter optimization to model training (RandomizedSearchCV for all models, real metrics verified).
 - **2024-06-14**: Step 2 completed: Added model persistence module with versioned saving/loading and integrated it into the main pipeline.
 - **2024-06-14**: Step 3 completed: Created `inference.py` for batch and programmatic inference. Supports loading any saved model version, applies feature pipeline, outputs predictions (with probabilities), and supports CLI and DataFrame input.
+
+---
+
+# Task 4: Framework Restructuring and Abstraction
+
+## Objective
+
+Restructure the framework to be truly multi-purpose and production-ready by creating abstract base classes, implementing configuration management, and reorganizing the code structure.
+
+## Background
+
+Based on the comprehensive review, the current framework has several critical limitations:
+
+1. **Single Use Case**: Hardcoded for Adult Income dataset only
+2. **Poor Organization**: Flat structure, no separation of concerns
+3. **No Configuration**: All parameters hardcoded
+4. **No Abstraction**: Cannot be extended for other datasets
+
+## Steps
+
+- [ ] Create abstract base classes for core components (DataIngestion, FeatureEngineering, ModelTraining)
+- [ ] Implement YAML-based configuration management
+- [ ] Reorganize code into proper package structure
+- [ ] Create dataset-specific implementations as examples
+- [ ] Add comprehensive unit tests
+- [ ] Update documentation for new architecture
+
+## Success Criteria
+
+- Framework can be extended for new datasets without code changes
+- Configuration is externalized and validated
+- Code is properly organized and documented
+- Unit tests cover core functionality
+- Adult Income dataset works as a concrete implementation
+
+---
+
+## Task 4 Progress Log
+
+- **2024-06-14**: Task 4 created based on comprehensive review findings. Framework restructuring identified as critical priority.
+- **2024-06-14**: Step 1 completed: Created abstract base classes for core components (BaseDataIngestion, BaseFeatureEngineering, BaseModelTraining) with proper interfaces and validation.
+- **2024-06-14**: Step 2 completed: Implemented YAML-based configuration management with validation, environment support, and default configurations.

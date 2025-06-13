@@ -1,0 +1,54 @@
+# Auto ML Framework Configuration
+# Configuration for Adult Income dataset
+
+data:
+  train_path: "data/adult.data"
+  test_path: "data/adult.test"
+  validation_split: 0.2
+  random_state: 42
+
+features:
+  categorical_columns:
+    - "workclass"
+    - "education"
+    - "marital-status"
+    - "occupation"
+    - "relationship"
+    - "race"
+    - "sex"
+    - "native-country"
+  numerical_columns:
+    - "age"
+    - "fnlwgt"
+    - "education-num"
+    - "capital-gain"
+    - "capital-loss"
+    - "hours-per-week"
+  target_column: "target"
+  drop_columns: []
+
+model:
+  task_type: "classification" # classification or regression
+  algorithms:
+    - "logistic_regression"
+    - "random_forest"
+    - "gradient_boosting"
+    - "lightgbm"
+  hyperparameter_optimization: true
+  cross_validation_folds: 5
+  random_state: 42
+
+training:
+  test_size: 0.2
+  random_state: 42
+  enable_hyperparameter_optimization: true
+
+persistence:
+  models_dir: "models"
+  version_format: "v{version}_{timestamp}"
+  save_feature_pipeline: true
+
+logging:
+  level: "INFO"
+  file: "pipeline.log"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
