@@ -26,6 +26,7 @@ from .data.ingestion import AdultIncomeDataIngestion
 from .features.engineering import StandardFeatureEngineering
 from .models.training import ClassificationModelTraining
 from .models.persistence import ModelPersistence
+from .deployment.api import ModelAPI
 
 __version__ = "0.1.0"
 
@@ -45,4 +46,5 @@ __all__ = [
     'StandardFeatureEngineering',
     'ClassificationModelTraining',
     'ModelPersistence',
+    'ModelAPI',
 ] 
