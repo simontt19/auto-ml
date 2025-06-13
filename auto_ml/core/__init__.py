@@ -5,7 +5,15 @@ Contains abstract base classes and core functionality for the ML framework.
 
 from .base_classes import BaseDataIngestion, BaseFeatureEngineering, BaseModelTraining
 from .config import Config
-from .exceptions import AutoMLError, ValidationError, ConfigurationError
+from .exceptions import (
+    AutoMLError, 
+    ValidationError, 
+    ConfigurationError, 
+    DataIngestionError, 
+    FeatureEngineeringError, 
+    ModelTrainingError,
+    ModelPersistenceError
+)
 
 __all__ = [
     'BaseDataIngestion',
@@ -14,5 +22,9 @@ __all__ = [
     'Config',
     'AutoMLError',
     'ValidationError',
-    'ConfigurationError'
+    'ConfigurationError',
+    'DataIngestionError',
+    'FeatureEngineeringError',
+    'ModelTrainingError',
+    'ModelPersistenceError'
 ] 

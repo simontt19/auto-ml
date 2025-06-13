@@ -18,12 +18,14 @@ from .core import (
     Config,
     AutoMLError,
     ValidationError,
-    ConfigurationError
+    ConfigurationError,
+    ModelPersistenceError
 )
 
 from .data.ingestion import AdultIncomeDataIngestion
 from .features.engineering import StandardFeatureEngineering
 from .models.training import ClassificationModelTraining
+from .models.persistence import ModelPersistence
 
 __version__ = "0.1.0"
 
@@ -36,9 +38,11 @@ __all__ = [
     'AutoMLError',
     'ValidationError',
     'ConfigurationError',
+    'ModelPersistenceError',
     
     # Concrete implementations
     'AdultIncomeDataIngestion',
     'StandardFeatureEngineering',
     'ClassificationModelTraining',
+    'ModelPersistence',
 ] 
