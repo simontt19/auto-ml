@@ -1,13 +1,14 @@
 """
 Abstract base classes for the Auto ML framework.
-Defines the interface for data ingestion, feature engineering, and model training.
+Defines the interface for data ingestion, feature engineering, model training, and monitoring.
 """
 
 from abc import ABC, abstractmethod
 from typing import Dict, List, Any, Optional, Tuple, Union
 import pandas as pd
 import logging
-from .exceptions import DataIngestionError, FeatureEngineeringError, ModelTrainingError
+from .exceptions import DataIngestionError, FeatureEngineeringError, ModelTrainingError, MonitoringError
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -358,4 +359,96 @@ class BaseModelTraining(ABC):
             return filename
             
         except Exception as e:
-            raise ModelTrainingError(f"Error saving results: {e}") 
+            raise ModelTrainingError(f"Error saving results: {e}")
+
+class BaseMonitoring(ABC):
+    """
+    Abstract base class for model monitoring and drift detection.
+    
+    This class defines the interface for monitoring model performance,
+    detecting data drift, and generating alerts.
+    """
+    
+    def __init__(self, config: Optional[Dict[str, Any]] = None):
+        """
+        Initialize monitoring system.
+        
+        Args:
+            config (Optional[Dict[str, Any]]): Configuration dictionary
+        """
+        self.config = config or {}
+        self.baseline_data: Optional[pd.DataFrame] = None
+        self.monitoring_history: List[Dict[str, Any]] = []
+        self.alerts: List[Dict[str, Any]] = []
+    
+    @abstractmethod
+    def set_baseline(self, data: pd.DataFrame, target_column: Optional[str] = None,
+                    predictions: Optional[np.ndarray] = None) -> None:
+        """
+        Set baseline data for monitoring.
+        
+        Args:
+            data (pd.DataFrame): Baseline data
+            target_column (Optional[str]): Target column name
+            predictions (Optional[np.ndarray]): Model predictions on baseline data
+            
+        Raises:
+            MonitoringError: If baseline setting fails
+        """
+        pass
+    
+    @abstractmethod
+    def detect_drift(self, current_data: pd.DataFrame, 
+                    target_column: Optional[str] = None,
+                    predictions: Optional[np.ndarray] = None) -> Dict[str, Any]:
+        """
+        Detect drift in current data compared to baseline.
+        
+        Args:
+            current_data (pd.DataFrame): Current data to check for drift
+            target_column (Optional[str]): Target column name
+            predictions (Optional[np.ndarray]): Model predictions on current data
+            
+        Returns:
+            Dict[str, Any]: Drift detection results
+            
+        Raises:
+            MonitoringError: If drift detection fails
+        """
+        pass
+    
+    @abstractmethod
+    def get_monitoring_summary(self) -> Dict[str, Any]:
+        """
+        Get summary of monitoring results.
+        
+        Returns:
+            Dict[str, Any]: Monitoring summary
+        """
+        pass
+    
+    def validate_monitoring_data(self, data: pd.DataFrame) -> None:
+        """
+        Validate data for monitoring.
+        
+        Args:
+            data (pd.DataFrame): Data to validate
+            
+        Raises:
+            MonitoringError: If validation fails
+        """
+        if data.empty:
+            raise MonitoringError("Monitoring data cannot be empty")
+        
+        if data.isnull().all().any():
+            raise MonitoringError("Data contains columns with all null values")
+        
+        logger.info(f"Monitoring data validation passed. Shape: {data.shape}")
+    
+    def clear_history(self) -> None:
+        """
+        Clear monitoring history.
+        """
+        self.monitoring_history = []
+        self.alerts = []
+        logger.info("Monitoring history cleared") 

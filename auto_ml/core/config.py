@@ -1,209 +1,188 @@
 """
 Configuration management for the Auto ML framework.
-Handles YAML configuration files with validation and environment-specific settings.
+Handles API credentials, environment settings, and framework configuration.
 """
 
-import yaml
 import os
-from typing import Dict, Any, Optional
+import yaml
 from pathlib import Path
-from .exceptions import ConfigurationError
+from typing import Dict, Any, Optional
+import logging
 
-class Config:
-    """
-    Configuration management class for the Auto ML framework.
+logger = logging.getLogger(__name__)
+
+
+class ConfigManager:
+    """Manages configuration and API credentials for the Auto ML framework."""
     
-    Supports:
-    - YAML configuration files
-    - Environment-specific settings
-    - Parameter validation
-    - Default values
-    """
-    
-    def __init__(self, config_path: Optional[str] = None):
+    def __init__(self, config_dir: str = "configs"):
         """
-        Initialize configuration.
+        Initialize the configuration manager.
         
         Args:
-            config_path (Optional[str]): Path to configuration file
+            config_dir: Directory containing configuration files
         """
-        self.config_path = config_path
-        self.config: Dict[str, Any] = {}
-        self._load_config()
-    
-    def _load_config(self) -> None:
-        """Load configuration from file or use defaults."""
-        if self.config_path and os.path.exists(self.config_path):
+        self.config_dir = Path(config_dir)
+        self._credentials: Optional[Dict[str, Any]] = None
+        self._settings: Optional[Dict[str, Any]] = None
+        
+    def load_credentials(self) -> Dict[str, Any]:
+        """
+        Load API credentials from configuration file.
+        
+        Returns:
+            Dictionary containing API credentials
+            
+        Raises:
+            FileNotFoundError: If credentials file doesn't exist
+            yaml.YAMLError: If credentials file is malformed
+        """
+        if self._credentials is None:
+            credentials_file = self.config_dir / "api_credentials.yaml"
+            
+            if not credentials_file.exists():
+                logger.warning(f"Credentials file not found: {credentials_file}")
+                return {}
+                
             try:
-                with open(self.config_path, 'r') as f:
-                    self.config = yaml.safe_load(f)
+                with open(credentials_file, 'r') as f:
+                    config = yaml.safe_load(f)
+                    self._credentials = config.get('api_credentials', {})
+                    logger.info("API credentials loaded successfully")
+            except yaml.YAMLError as e:
+                logger.error(f"Error parsing credentials file: {e}")
+                raise
             except Exception as e:
-                raise ConfigurationError(f"Failed to load config from {self.config_path}: {e}")
-        else:
-            # Use default configuration
-            self.config = self._get_default_config()
+                logger.error(f"Error loading credentials: {e}")
+                raise
+                
+        return self._credentials
     
-    def _get_default_config(self) -> Dict[str, Any]:
-        """Get default configuration."""
-        return {
-            'data': {
-                'train_path': 'data/train.csv',
-                'test_path': 'data/test.csv',
-                'validation_split': 0.2,
-                'random_state': 42
-            },
-            'features': {
-                'categorical_columns': [],
-                'numerical_columns': [],
-                'target_column': 'target',
-                'drop_columns': []
-            },
-            'model': {
-                'task_type': 'classification',  # 'classification', 'regression'
-                'algorithms': ['logistic_regression', 'random_forest', 'lightgbm'],
-                'hyperparameter_optimization': True,
-                'cross_validation_folds': 5,
-                'random_state': 42
-            },
-            'training': {
-                'test_size': 0.2,
-                'random_state': 42,
-                'enable_hyperparameter_optimization': True
-            },
-            'persistence': {
-                'models_dir': 'models',
-                'version_format': 'v{version}_{timestamp}',
-                'save_feature_pipeline': True
-            },
-            'logging': {
-                'level': 'INFO',
-                'file': 'pipeline.log',
-                'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-            }
-        }
+    def get_huggingface_token(self) -> Optional[str]:
+        """Get Hugging Face API token."""
+        credentials = self.load_credentials()
+        return credentials.get('huggingface', {}).get('token')
     
-    def get(self, key: str, default: Any = None) -> Any:
+    def get_huggingface_config(self) -> Dict[str, Any]:
+        """Get complete Hugging Face configuration."""
+        credentials = self.load_credentials()
+        return credentials.get('huggingface', {})
+    
+    def get_github_config(self) -> Dict[str, Any]:
+        """Get GitHub configuration."""
+        credentials = self.load_credentials()
+        return credentials.get('github', {})
+    
+    def get_deployment_config(self) -> Dict[str, Any]:
+        """Get deployment platform configurations."""
+        credentials = self.load_credentials()
+        return credentials.get('deployment', {})
+    
+    def load_settings(self) -> Dict[str, Any]:
         """
-        Get configuration value using dot notation.
+        Load framework settings from configuration file.
+        
+        Returns:
+            Dictionary containing framework settings
+        """
+        if self._settings is None:
+            credentials_file = self.config_dir / "api_credentials.yaml"
+            
+            if not credentials_file.exists():
+                logger.warning(f"Settings file not found: {credentials_file}")
+                return {}
+                
+            try:
+                with open(credentials_file, 'r') as f:
+                    config = yaml.safe_load(f)
+                    self._settings = config.get('environments', {}).get('development', {})
+                    logger.info("Framework settings loaded successfully")
+            except yaml.YAMLError as e:
+                logger.error(f"Error parsing settings file: {e}")
+                return {}
+            except Exception as e:
+                logger.error(f"Error loading settings: {e}")
+                return {}
+                
+        return self._settings
+    
+    def get_setting(self, key: str, default: Any = None) -> Any:
+        """
+        Get a specific setting value.
         
         Args:
-            key (str): Configuration key (e.g., 'data.train_path')
-            default (Any): Default value if key not found
+            key: Setting key to retrieve
+            default: Default value if key not found
             
         Returns:
-            Any: Configuration value
+            Setting value or default
         """
-        keys = key.split('.')
-        value = self.config
-        
-        try:
-            for k in keys:
-                value = value[k]
-            return value
-        except (KeyError, TypeError):
-            return default
+        settings = self.load_settings()
+        return settings.get(key, default)
     
-    def set(self, key: str, value: Any) -> None:
-        """
-        Set configuration value using dot notation.
-        
-        Args:
-            key (str): Configuration key (e.g., 'data.train_path')
-            value (Any): Value to set
-        """
-        keys = key.split('.')
-        config = self.config
-        
-        # Navigate to the parent of the target key
-        for k in keys[:-1]:
-            if k not in config:
-                config[k] = {}
-            config = config[k]
-        
-        # Set the value
-        config[keys[-1]] = value
+    def is_debug_mode(self) -> bool:
+        """Check if debug mode is enabled."""
+        return self.get_setting('debug', False)
     
-    def save(self, path: Optional[str] = None) -> None:
-        """
-        Save configuration to file.
-        
-        Args:
-            path (Optional[str]): Path to save config (uses self.config_path if None)
-        """
-        save_path = path or self.config_path
-        if not save_path:
-            raise ConfigurationError("No path specified for saving configuration")
-        
-        try:
-            os.makedirs(os.path.dirname(save_path), exist_ok=True)
-            with open(save_path, 'w') as f:
-                yaml.dump(self.config, f, default_flow_style=False, indent=2)
-        except Exception as e:
-            raise ConfigurationError(f"Failed to save config to {save_path}: {e}")
+    def get_log_level(self) -> str:
+        """Get configured log level."""
+        return self.get_setting('log_level', 'INFO')
     
-    def validate(self) -> None:
-        """Validate configuration values."""
-        required_keys = [
-            'data.train_path',
-            'features.target_column',
-            'model.task_type',
-            'model.algorithms'
-        ]
-        
-        for key in required_keys:
-            if self.get(key) is None:
-                raise ConfigurationError(f"Required configuration key missing: {key}")
-        
-        # Validate task type
-        task_type = self.get('model.task_type')
-        if task_type not in ['classification', 'regression']:
-            raise ConfigurationError(f"Invalid task_type: {task_type}. Must be 'classification' or 'regression'")
-        
-        # Validate algorithms
-        algorithms = self.get('model.algorithms')
-        if not isinstance(algorithms, list) or len(algorithms) == 0:
-            raise ConfigurationError("model.algorithms must be a non-empty list")
-        
-        # Validate validation split
-        validation_split = self.get('data.validation_split')
-        if not (0 < validation_split < 1):
-            raise ConfigurationError(f"validation_split must be between 0 and 1, got {validation_split}")
+    def is_cache_enabled(self) -> bool:
+        """Check if caching is enabled."""
+        return self.get_setting('cache_enabled', True)
     
-    def update_from_env(self) -> None:
-        """Update configuration from environment variables."""
-        env_mappings = {
-            'AUTO_ML_LOG_LEVEL': 'logging.level',
-            'AUTO_ML_MODELS_DIR': 'persistence.models_dir',
-            'AUTO_ML_RANDOM_STATE': 'training.random_state',
-            'AUTO_ML_TASK_TYPE': 'model.task_type'
-        }
-        
-        for env_var, config_key in env_mappings.items():
-            env_value = os.getenv(env_var)
-            if env_value is not None:
-                self.set(config_key, env_value)
-    
-    def get_environment_config(self, environment: str) -> 'Config':
+    def validate_credentials(self) -> bool:
         """
-        Get environment-specific configuration.
+        Validate that required credentials are available.
         
-        Args:
-            environment (str): Environment name (e.g., 'development', 'production')
-            
         Returns:
-            Config: Environment-specific configuration
+            True if all required credentials are present
         """
-        env_config = Config()
-        env_config.config = self.config.copy()
+        credentials = self.load_credentials()
         
-        # Load environment-specific overrides
-        env_file = f"config.{environment}.yaml"
-        if os.path.exists(env_file):
-            try:
-                with open(env_file, 'r') as f:
-                    env_overrides = yaml.safe_load(f)
-                    env_config.config.update(env_overrides)
-            except Exception as e:
-                raise ConfigurationError(f"Failed to load environment config {env_file}: {e}")
+        # Check for required credentials
+        required = ['huggingface']
         
-        return env_config 
+        for service in required:
+            if service not in credentials:
+                logger.warning(f"Missing required service configuration: {service}")
+                return False
+                
+        # Check for required tokens
+        hf_config = credentials.get('huggingface', {})
+        if not hf_config.get('token'):
+            logger.warning("Missing Hugging Face API token")
+            return False
+            
+        logger.info("All required credentials validated successfully")
+        return True
+    
+    def get_model_cache_dir(self) -> str:
+        """Get the model cache directory path."""
+        hf_config = self.get_huggingface_config()
+        return hf_config.get('model_cache_dir', './models/huggingface_cache')
+
+
+# Global configuration instance
+config_manager = ConfigManager()
+
+
+def get_config() -> ConfigManager:
+    """Get the global configuration manager instance."""
+    return config_manager
+
+
+def get_huggingface_token() -> Optional[str]:
+    """Get Hugging Face API token from global config."""
+    return config_manager.get_huggingface_token()
+
+
+def is_debug_mode() -> bool:
+    """Check if debug mode is enabled from global config."""
+    return config_manager.is_debug_mode()
+
+
+def get_log_level() -> str:
+    """Get log level from global config."""
+    return config_manager.get_log_level() 

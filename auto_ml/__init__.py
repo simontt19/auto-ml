@@ -15,10 +15,17 @@ from .core import (
     BaseDataIngestion,
     BaseFeatureEngineering,
     BaseModelTraining,
-    Config,
+    ConfigManager,
+    get_config,
+    get_huggingface_token,
+    is_debug_mode,
+    get_log_level,
     AutoMLError,
     ValidationError,
     ConfigurationError,
+    DataIngestionError,
+    FeatureEngineeringError,
+    ModelTrainingError,
     ModelPersistenceError
 )
 
@@ -35,10 +42,17 @@ __all__ = [
     'BaseDataIngestion',
     'BaseFeatureEngineering',
     'BaseModelTraining',
-    'Config',
+    'ConfigManager',
+    'get_config',
+    'get_huggingface_token',
+    'is_debug_mode',
+    'get_log_level',
     'AutoMLError',
     'ValidationError',
     'ConfigurationError',
+    'DataIngestionError',
+    'FeatureEngineeringError',
+    'ModelTrainingError',
     'ModelPersistenceError',
     
     # Concrete implementations
