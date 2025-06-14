@@ -30,6 +30,10 @@ class ModelPersistenceError(AutoMLError):
     """Raised when model persistence operations fail."""
     pass
 
+class ModelRegistryError(AutoMLError):
+    """Raised when model registry operations fail."""
+    pass
+
 class MonitoringError(AutoMLError):
-    """Raised when monitoring and drift detection operations fail."""
+    """Raised when monitoring operations fail."""
     pass 

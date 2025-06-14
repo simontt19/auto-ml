@@ -17,7 +17,7 @@ import time
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from auto_ml import (
-    Config,
+    ConfigManager,
     AdultIncomeDataIngestion,
     StandardFeatureEngineering,
     ClassificationModelTraining,
@@ -41,10 +41,11 @@ def test_api():
             
             # 1. Train and save a model
             logger.info("1. Training and saving a model...")
-            config = Config('config.yaml')
-            ingestion = AdultIncomeDataIngestion(config.config)
-            fe = StandardFeatureEngineering(config.config)
-            mt = ClassificationModelTraining(config.config)
+            config_manager = ConfigManager('configs')
+            config = config_manager.load_settings()
+            ingestion = AdultIncomeDataIngestion(config)
+            fe = StandardFeatureEngineering(config)
+            mt = ClassificationModelTraining(config)
             mp = ModelPersistence(models_dir=f"{temp_dir}/models")
             
             # Load and process data
@@ -175,14 +176,12 @@ def test_api():
             logger.info("Prediction after reload successful")
             
             logger.info("✅ All API tests passed!")
-            return True
             
     except Exception as e:
         logger.error(f"❌ Test failed: {e}")
         import traceback
         traceback.print_exc()
-        return False
+        raise  # Re-raise the exception for pytest to catch
 
 if __name__ == "__main__":
-    success = test_api()
-    sys.exit(0 if success else 1) 
+    test_api() 

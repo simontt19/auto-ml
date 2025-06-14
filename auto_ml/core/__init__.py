@@ -12,7 +12,8 @@ from .exceptions import (
     DataIngestionError, 
     FeatureEngineeringError, 
     ModelTrainingError,
-    ModelPersistenceError
+    ModelPersistenceError,
+    ModelRegistryError
 )
 
 __all__ = [
@@ -30,5 +31,6 @@ __all__ = [
     'DataIngestionError',
     'FeatureEngineeringError',
     'ModelTrainingError',
-    'ModelPersistenceError'
+    'ModelPersistenceError',
+    'ModelRegistryError',
 ] 

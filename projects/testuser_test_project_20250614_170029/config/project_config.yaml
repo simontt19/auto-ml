@@ -1,0 +1,21 @@
+created_at: '2025-06-14T17:00:29.345955'
+data:
+  source_path: ''
+  target_column: ''
+  validation_split: 0.2
+features:
+  categorical_columns: []
+  engineering_type: standard
+  numerical_columns: []
+model:
+  algorithms:
+  - logistic_regression
+  - random_forest
+  - lightgbm
+  hyperparameter_optimization: true
+  task_type: classification
+monitoring:
+  alert_on_drift: true
+  drift_threshold: 0.05
+  performance_threshold: 0.1
+project_id: testuser_test_project_20250614_170029

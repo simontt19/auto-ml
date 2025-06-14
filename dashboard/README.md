@@ -178,6 +178,11 @@ This project is part of the Auto ML framework and follows the same license.
 
 For issues and questions:
 
-1. Check the [Auto ML documentation](../docs/)
-2. Review the [project state](../docs/project_state.md)
+1. Check the [Auto ML documentation](../prompts/)
+2. Review the [project state](../prompts/project_state.md)
 3. Create an issue in the GitHub repository
+
+## Troubleshooting
+
+1. Check the [Auto ML documentation](../prompts/)
+2. Review the [project state](../prompts/project_state.md)

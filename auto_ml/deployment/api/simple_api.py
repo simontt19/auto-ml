@@ -18,7 +18,9 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, Field
 from typing import Dict, List, Any, Optional
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
+import jwt
+import hashlib
 
 # Import our modules with proper path handling
 try:
@@ -53,7 +55,25 @@ logger = logging.getLogger(__name__)
 # Security scheme
 security = HTTPBearer()
 
+# JWT Configuration
+JWT_SECRET = "your-secret-key-change-in-production"
+JWT_ALGORITHM = "HS256"
+
+# Simple password storage (in production, use proper password hashing)
+DEMO_PASSWORDS = {
+    "admin": "admin123",
+    "testuser": "test123"
+}
+
 # Pydantic models
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+class LoginResponse(BaseModel):
+    user: Dict[str, Any]
+    token: str
+
 class HealthResponse(BaseModel):
     status: str
     timestamp: str
@@ -93,10 +113,80 @@ user_manager = UserManager()
 feature_engineering = StandardFeatureEngineering()
 model_registry = ModelRegistry()
 
+def create_access_token(data: dict):
+    """Create JWT token."""
+    to_encode = data.copy()
+    expire = datetime.utcnow() + timedelta(hours=24)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGORITHM)
+    return encoded_jwt
+
+def verify_token(token: str):
+    """Verify JWT token."""
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            return None
+        return username
+    except jwt.PyJWTError:
+        return None
+
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """Get current user from token."""
+    token = credentials.credentials
+    username = verify_token(token)
+    if username is None:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    
+    user = user_manager.get_user(username)
+    if user is None:
+        raise HTTPException(status_code=401, detail="User not found")
+    
+    return user
+
 @app.get("/")
 async def root():
     """Root endpoint."""
     return {"message": "Auto ML API is running!", "version": "1.0.0"}
+
+@app.post("/auth/login", response_model=LoginResponse)
+async def login(request: LoginRequest):
+    """Login endpoint."""
+    # Check if user exists
+    user = user_manager.get_user(request.username)
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    
+    # Check password (simple demo implementation)
+    if request.password != DEMO_PASSWORDS.get(request.username):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    
+    # Create token
+    token = create_access_token({"sub": request.username})
+    
+    # Update last login
+    user_manager.update_user(request.username, last_login=datetime.now().isoformat())
+    
+    return LoginResponse(
+        user={
+            "username": user.username,
+            "email": user.email,
+            "role": user.role.value,
+            "projects": user.projects
+        },
+        token=token
+    )
+
+@app.get("/auth/me")
+async def get_current_user_info(current_user: User = Depends(get_current_user)):
+    """Get current user information."""
+    return {
+        "username": current_user.username,
+        "email": current_user.email,
+        "role": current_user.role.value,
+        "projects": current_user.projects
+    }
 
 @app.get("/health", response_model=HealthResponse)
 async def health_check():
@@ -114,7 +204,7 @@ async def list_users():
     """List all users."""
     try:
         users = user_manager.list_users()
-        return {"users": users}
+        return {"users": [{"username": u.username, "email": u.email, "role": u.role.value} for u in users]}
     except Exception as e:
         logger.error(f"Error listing users: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
@@ -123,21 +213,16 @@ async def list_users():
 async def list_projects():
     """List all projects."""
     try:
-        projects = user_manager.list_projects()
-        return {"projects": projects}
+        projects = user_manager.list_all_projects()
+        return {"projects": [{"project_id": p.project_id, "name": p.name, "owner": p.owner, "description": p.description} for p in projects]}
     except Exception as e:
         logger.error(f"Error listing projects: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
 @app.post("/predict", response_model=PredictionResponse)
-async def predict(request: PredictionRequest, credentials: HTTPAuthorizationCredentials = Depends(security)):
+async def predict(request: PredictionRequest, current_user: User = Depends(get_current_user)):
     """Make a prediction."""
     try:
-        # Simple token validation
-        token = credentials.credentials
-        if not token or len(token) < 3:
-            raise HTTPException(status_code=401, detail="Invalid token")
-        
         # Mock prediction for testing
         prediction = 0.85
         probability = 0.92

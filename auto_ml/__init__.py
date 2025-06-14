@@ -9,6 +9,7 @@ This framework provides:
 - Hyperparameter optimization
 - Model persistence and versioning
 - Production deployment capabilities
+- Enterprise-grade model registry with metadata tracking
 """
 
 from .core import (
@@ -33,6 +34,7 @@ from .data.ingestion import AdultIncomeDataIngestion
 from .features.engineering import StandardFeatureEngineering
 from .models.training import ClassificationModelTraining
 from .models.persistence import ModelPersistence
+from .models.registry import ModelRegistry, ModelMetadata, ModelStatus, ModelStage
 from .deployment.api import ModelAPI
 
 __version__ = "0.1.0"
@@ -61,4 +63,10 @@ __all__ = [
     'ClassificationModelTraining',
     'ModelPersistence',
     'ModelAPI',
+    
+    # Model Registry
+    'ModelRegistry',
+    'ModelMetadata',
+    'ModelStatus',
+    'ModelStage',
 ] 

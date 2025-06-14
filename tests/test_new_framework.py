@@ -12,7 +12,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from auto_ml import (
-    Config,
+    ConfigManager,
     AdultIncomeDataIngestion,
     StandardFeatureEngineering,
     ClassificationModelTraining
@@ -30,19 +30,19 @@ def test_new_framework():
     try:
         # 1. Test configuration
         logger.info("1. Testing configuration...")
-        config = Config('config.yaml')
-        config.validate()
-        logger.info(f"Configuration loaded successfully. Task type: {config.get('model.task_type')}")
+        config_manager = ConfigManager('configs')
+        config = config_manager.load_settings()
+        logger.info(f"Configuration loaded successfully. Task type: {config.get('model', {}).get('task_type', 'classification')}")
         
         # 2. Test data ingestion
         logger.info("2. Testing data ingestion...")
-        ingestion = AdultIncomeDataIngestion(config.config)
+        ingestion = AdultIncomeDataIngestion(config)
         train_data, test_data = ingestion.load_data()
         logger.info(f"Data loaded: Train {train_data.shape}, Test {test_data.shape}")
         
         # 3. Test feature engineering
         logger.info("3. Testing feature engineering...")
-        fe = StandardFeatureEngineering(config.config)
+        fe = StandardFeatureEngineering(config)
         cat_cols = ingestion.get_categorical_columns()
         num_cols = ingestion.get_numerical_columns()
         
@@ -52,7 +52,7 @@ def test_new_framework():
         
         # 4. Test model training
         logger.info("4. Testing model training...")
-        mt = ClassificationModelTraining(config.config)
+        mt = ClassificationModelTraining(config)
         feature_names = fe.get_feature_names(cat_cols, num_cols)
         
         # Use a small subset for quick testing
@@ -73,14 +73,12 @@ def test_new_framework():
             logger.info(f"Top 3 features: {feature_importance.head(3)['feature'].tolist()}")
         
         logger.info("✅ All tests passed! New framework structure is working correctly.")
-        return True
         
     except Exception as e:
         logger.error(f"❌ Test failed: {e}")
         import traceback
         traceback.print_exc()
-        return False
+        raise  # Re-raise the exception for pytest to catch
 
 if __name__ == "__main__":
-    success = test_new_framework()
-    sys.exit(0 if success else 1) 
+    test_new_framework() 
