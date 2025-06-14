@@ -9,8 +9,8 @@ from typing import Dict, List, Any, Optional, Tuple
 import logging
 from pathlib import Path
 
-from ...core.base_classes import BaseDataIngestion
-from ...core.exceptions import DataIngestionError
+from auto_ml.core.base_classes import BaseDataIngestion
+from auto_ml.core.exceptions import DataIngestionError
 
 logger = logging.getLogger(__name__)
 

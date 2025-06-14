@@ -1,0 +1,1 @@
+web: uvicorn auto_ml.deployment.api.simple_api:app --host=0.0.0.0 --port=$PORT 

@@ -4,6 +4,7 @@ FastAPI-based REST API for model serving in production with user authentication 
 """
 
 import logging
+import asyncio
 import json
 import numpy as np
 import pandas as pd
@@ -17,10 +18,15 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, Field
 import joblib
 
-from ...models.persistence import ModelPersistence
-from ...features.engineering import StandardFeatureEngineering
-from ...core.exceptions import ModelPersistenceError
-from ...core.user_management import UserManager, User, Project
+# Use relative imports that work with the current structure
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+
+from models.persistence import ModelPersistence
+from features.engineering import StandardFeatureEngineering
+from core.exceptions import ModelPersistenceError
+from core.user_management import UserManager, User, Project
 
 logger = logging.getLogger(__name__)
 

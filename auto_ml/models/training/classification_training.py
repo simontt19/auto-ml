@@ -20,8 +20,8 @@ import traceback
 from datetime import datetime
 from scipy.stats import uniform, randint
 
-from ...core.base_classes import BaseModelTraining
-from ...core.exceptions import ModelTrainingError
+from auto_ml.core.base_classes import BaseModelTraining
+from auto_ml.core.exceptions import ModelTrainingError
 
 logger = logging.getLogger(__name__)
 

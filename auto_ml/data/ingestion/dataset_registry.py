@@ -10,8 +10,8 @@ import importlib
 import inspect
 from abc import ABC
 
-from ...core.base_classes import BaseDataIngestion
-from ...core.exceptions import DataIngestionError
+from auto_ml.core.base_classes import BaseDataIngestion
+from auto_ml.core.exceptions import DataIngestionError
 
 logger = logging.getLogger(__name__)
 

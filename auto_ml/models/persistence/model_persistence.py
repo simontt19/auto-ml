@@ -15,8 +15,8 @@ import shutil
 import hashlib
 import yaml
 
-from ...core.base_classes import BaseModelTraining
-from ...core.exceptions import ModelPersistenceError
+from auto_ml.core.base_classes import BaseModelTraining
+from auto_ml.core.exceptions import ModelPersistenceError
 
 logger = logging.getLogger(__name__)
 

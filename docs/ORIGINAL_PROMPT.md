@@ -12,6 +12,7 @@ Build a comprehensive, production-ready machine learning framework that can hand
 4. **Modular Design**: Create reusable components that can work with different datasets
 5. **Comprehensive Documentation**: Maintain clear documentation and logs
 6. **Periodic Review**: After completing several tasks, review outcomes, identify problems, and adjust the prompt with new information as needed
+7. **Troubleshooting Best Practices**: Always use the project venv for local testing and troubleshooting. Document all troubleshooting steps and solutions in `docs/debug_logs.md` for future reference. When encountering new or unfamiliar issues, search for knowledge and best practices online (e.g., official docs, Stack Overflow, GitHub issues) and document findings and solutions.
 
 ## Current Limitations to Address
 
@@ -34,3 +35,6 @@ Build a comprehensive, production-ready machine learning framework that can hand
 - Ensure the framework can handle multiple datasets and use cases
 - Include proper deployment and serving capabilities
 - Maintain clean, modular, and well-organized code structure
+- **Always use the venv for local testing and troubleshooting.**
+- **Document all troubleshooting steps in `docs/debug_logs.md`.**
+- **When encountering new issues, search for knowledge and best practices online and document solutions.**

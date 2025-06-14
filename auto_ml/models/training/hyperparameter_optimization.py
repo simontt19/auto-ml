@@ -52,8 +52,8 @@ except ImportError:
     XGBOOST_AVAILABLE = False
     xgb = None
 
-from ...core.base_classes import BaseModelTraining
-from ...core.exceptions import ModelTrainingError
+from auto_ml.core.base_classes import BaseModelTraining
+from auto_ml.core.exceptions import ModelTrainingError
 
 logger = logging.getLogger(__name__)
 

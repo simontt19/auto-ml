@@ -23,8 +23,8 @@ from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from ..core.base_classes import BaseMonitoring
-from ..core.exceptions import MonitoringError
+from auto_ml.core.base_classes import BaseMonitoring
+from auto_ml.core.exceptions import MonitoringError
 
 logger = logging.getLogger(__name__)
 

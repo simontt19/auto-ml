@@ -11,8 +11,8 @@ from sklearn.impute import SimpleImputer
 import logging
 import traceback
 
-from ...core.base_classes import BaseFeatureEngineering
-from ...core.exceptions import FeatureEngineeringError
+from auto_ml.core.base_classes import BaseFeatureEngineering
+from auto_ml.core.exceptions import FeatureEngineeringError
 
 logger = logging.getLogger(__name__)
 
