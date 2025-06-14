@@ -12,7 +12,7 @@ current_dir = Path(__file__).parent
 auto_ml_dir = current_dir.parent.parent  # Go up to project root
 sys.path.insert(0, str(auto_ml_dir))
 
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, Body
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, Field
@@ -25,6 +25,7 @@ try:
     from auto_ml.core.user_management import UserManager, User, Project
     from auto_ml.models.persistence import ModelPersistence
     from auto_ml.features.engineering import StandardFeatureEngineering
+    from auto_ml.models.persistence.model_registry import ModelRegistry
 except ImportError as e:
     # Fallback for deployment environment
     logging.warning(f"Import error: {e}. Using mock implementations.")
@@ -90,6 +91,7 @@ app.add_middleware(
 # Initialize components
 user_manager = UserManager()
 feature_engineering = StandardFeatureEngineering()
+model_registry = ModelRegistry()
 
 @app.get("/")
 async def root():
@@ -160,6 +162,41 @@ async def predict(request: PredictionRequest, credentials: HTTPAuthorizationCred
 async def get_docs():
     """API documentation."""
     return {"message": "API documentation available at /docs"}
+
+@app.get("/models/registry")
+async def list_registered_models():
+    """List all registered models and their metadata."""
+    return {"models": model_registry.list_models()}
+
+@app.get("/models/registry/{model_id}")
+async def get_registered_model(model_id: str):
+    """Get metadata for a specific model."""
+    model = model_registry.get_model(model_id)
+    if not model:
+        raise HTTPException(status_code=404, detail="Model not found")
+    return model
+
+@app.post("/models/registry")
+async def register_model(metadata: dict = Body(...)):
+    """Register a new model with metadata."""
+    model_registry.register_model(metadata)
+    return {"status": "registered", "model_id": metadata.get("model_id")}
+
+@app.put("/models/registry/{model_id}")
+async def update_registered_model(model_id: str, updates: dict = Body(...)):
+    """Update metadata for a specific model."""
+    updated = model_registry.update_model(model_id, updates)
+    if not updated:
+        raise HTTPException(status_code=404, detail="Model not found or not updated")
+    return {"status": "updated", "model_id": model_id}
+
+@app.delete("/models/registry/{model_id}")
+async def delete_registered_model(model_id: str):
+    """Delete a model from the registry."""
+    deleted = model_registry.delete_model(model_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Model not found or not deleted")
+    return {"status": "deleted", "model_id": model_id}
 
 if __name__ == "__main__":
     import uvicorn

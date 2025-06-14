@@ -512,3 +512,53 @@ By the end of Task 7, the framework will have:
 - **2024-06-14**: Task 7 created to focus on free deployment and production testing.
 - **2024-06-14**: Foundation completed with multi-user system, production-ready API, and web dashboard.
 - **2024-06-14**: Ready to begin Step 1 - API Deployment (Heroku/Railway).
+
+# Task 8: Toward Enterprise-Grade ML Framework
+
+## Milestone: Production API Live
+
+- The backend API is now live and healthy at https://auto-ml-production.up.railway.app
+- All import and deployment issues resolved
+- CI/CD pipeline enables instant live upgrades
+
+## Next Steps (Enterprise Roadmap)
+
+### 1. Advanced Model Management
+
+- [ ] Implement model registry with metadata, lineage, and versioning
+- [ ] Add model promotion, rollback, and A/B testing
+- [ ] Integrate Hugging Face model sharing
+
+### 2. Scalability & Performance
+
+- [ ] Add distributed training and batch prediction
+- [ ] Implement model and data caching
+- [ ] Optimize for high-throughput API serving
+
+### 3. Security & Compliance
+
+- [ ] Add authentication/authorization (JWT, OAuth)
+- [ ] Implement audit logging and data lineage
+- [ ] Add encryption for data at rest and in transit
+- [ ] Ensure GDPR/CCPA compliance
+
+### 4. Monitoring & Observability
+
+- [ ] Integrate Prometheus/Grafana for metrics
+- [ ] Add real-time drift and performance monitoring
+- [ ] Implement alerting and automated remediation
+
+### 5. User & Project Management
+
+- [ ] Enhance multi-user, multi-project isolation
+- [ ] Add user roles, quotas, and billing hooks
+
+### 6. Documentation & Developer Experience
+
+- [ ] Expand API and user documentation
+- [ ] Add onboarding guides and code samples
+- [ ] Improve error messages and troubleshooting
+
+## Immediate Next Task
+
+- [ ] Implement model registry and metadata tracking (start with basic version)

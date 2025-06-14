@@ -1,5 +1,18 @@
 # Final Goal: Enterprise-Scale Auto ML Framework
 
+## Deployment Status (2025-06-14)
+
+- The backend FastAPI API is now live and healthy at: https://auto-ml-production.up.railway.app
+- All import and deployment issues have been resolved.
+- The system now supports instant live upgrades and optimizations via CI/CD.
+- **Note:** The project is still far from a true enterprise-level ML framework. Many advanced features, scalability, security, and compliance requirements remain to be implemented.
+
+## Continuous Deployment & Live Optimization
+
+- All code changes are automatically deployed to production via Railway.
+- The agent can now optimize and upgrade the backend, test locally, and instantly go live.
+- All troubleshooting and upgrade steps are documented in `docs/debug_logs.md`.
+
 ## Vision Statement
 
 Build a **comprehensive, enterprise-grade Auto ML framework** that can handle real-world scenarios with multiple users, projects, and massive scale. The framework should be **agent-friendly** for automated development and **user-friendly** for simple requirement specification.
