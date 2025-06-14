@@ -19,6 +19,8 @@ import json
 import traceback
 from datetime import datetime
 from scipy.stats import uniform, randint
+from auto_ml.models.persistence.model_registry import ModelRegistry
+import uuid
 
 from auto_ml.core.base_classes import BaseModelTraining
 from auto_ml.core.exceptions import ModelTrainingError
@@ -112,7 +114,7 @@ class ClassificationModelTraining(BaseModelTraining):
             Dict[str, Dict[str, float]]: Dictionary of model performance results
         """
         logger.info("Starting model training and evaluation...")
-        
+        model_registry = ModelRegistry()
         try:
             # Prepare data
             X_train_clean = X_train[feature_names].fillna(0)
@@ -151,6 +153,17 @@ class ClassificationModelTraining(BaseModelTraining):
                 self.results[model_name] = metrics
                 
                 logger.info(f"{model_name} - AUC: {metrics['auc']:.4f}, Accuracy: {metrics['accuracy']:.4f}")
+                # Register model in registry
+                model_id = str(uuid.uuid4())
+                metadata = {
+                    "model_id": model_id,
+                    "name": model_name,
+                    "version": self.config.get("version", "v1"),
+                    "owner": self.config.get("owner", "unknown"),
+                    "metrics": metrics,
+                    "registered_at": datetime.now().isoformat(),
+                }
+                model_registry.register_model(metadata)
             
             # Select best model
             self._select_best_model()
